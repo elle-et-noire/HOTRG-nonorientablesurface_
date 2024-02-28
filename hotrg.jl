@@ -5,9 +5,9 @@ function hotrg(A::ITensor, iA::Indices; maxdim, stepnum, eigvalnum, copybelow = 
   cftval = Dict(zip(["<C|i>", "<R|i>", "eigval"], [zeros(eigvalnum, stepnum) for _ in 1:3]))
 
   # init spatial reflection operator
-  iO = Indices(up = altind(iA.up), down = altind(iA.down))
-  O = δ(iO.up, iO.down)
-  refl(i, j) = replaceinds(O, iO.up => i, iO.down => j)
+  iO = Indices(left = altind(iA.left), right = altind(iA.left))
+  O = δ(iO.left, iO.right)
+  refl(i, j) = replaceinds(O, iO.left => i, iO.right => j)
 
   for i in 1:stepnum
     B, iB = copybelow(A, iA)
@@ -17,7 +17,7 @@ function hotrg(A::ITensor, iA::Indices; maxdim, stepnum, eigvalnum, copybelow = 
     M = AB * δ(iA.up, iB.down); iM1 = iA.left; iM2 = iB.left
     U1, S, _ = svd(M, (iM1, iM2); maxdim = eigvalnum)
     S = storage(S)
-    norms[i] = S[1]; S /= norms[i]; A /= norms[i]
+    norms[i] = S[1]; S /= norms[i]; AB /= norms[i]
     D = length(S)
     cftval["eigval"][1:D, i] = S
 
